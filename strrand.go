@@ -6,10 +6,16 @@ import (
 	"time"
 )
 
-func makeRange(from rune, to rune) []rune {
-	r := []rune{}
+func makeRange(from rune, to rune) (r []rune) {
 	for i := from; i <= to; i++ {
 		r = append(r, i)
+	}
+	return r
+}
+
+func concat(ss ...[]rune) (r []rune) {
+	for _, s := range ss {
+		r = append(r, s...)
 	}
 	return r
 }
@@ -29,21 +35,26 @@ func init() {
 	lower = makeRange('a', 'z')
 	digit = makeRange('0', '9')
 
-	punct = makeRange(33, 47)
-	punctB := makeRange(58, 64)
-	punctC := makeRange(123, 126)
-	punct = append(punct, punctB...)
-	punct = append(punct, punctC...)
+	punct = concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 96), makeRange(123, 126))
+	any = concat(upper, lower, digit, punct)
+	salt = concat(upper, lower, digit, []rune{'.', '/'})
+}
 
-	any = append(upper, lower...)
-	any = append(any, digit...)
-	any = append(any, punct...)
+var patterns = map[rune]([]rune){
+	'd': digit,
+	'D': concat(upper, lower, punct),
+	'w': concat(upper, lower, digit, []rune{'_'}),
+	'W': concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 94), makeRange(96, 96), makeRange(123, 126)),
+	's': []rune{' ', '\t'},
+	'S': concat(upper, lower, digit, punct),
 
-	salt = append(upper, lower...)
-	salt = append(salt, digit...)
-	salt = append(salt, '.', '/')
-
-	binary = makeRange(0, 255)
+	// these are translated to their double quoted equivalents.
+	't': []rune{'\t'},
+	'n': []rune{'\n'},
+	'r': []rune{'\r'},
+	'f': []rune{'\f'},
+	'a': []rune{'\a'},
+	'e': []rune{27}, // escape character
 }
 
 type strrand struct {
