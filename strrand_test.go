@@ -20,6 +20,14 @@ func TestMakeRange(t *testing.T) {
 	reg = `.[1-9koc\]]hoge`
 	ss, _ = New().Randregex(reg)
 	fmt.Printf("`%s`: %s\n", reg, ss)
+
+	reg = `[1-9koc\]]{16}`
+	ss, _ = New().Randregex(reg)
+	fmt.Printf("`%s`: %s\n", reg, ss)
+
+	reg = `a{1,4}`
+	ss, _ = New().Randregex(reg)
+	fmt.Printf("`%s`: %s\n", reg, ss)
 }
 
 func TestPicker(t *testing.T) {
