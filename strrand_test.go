@@ -13,8 +13,13 @@ func TestMakeRange(t *testing.T) {
 		t.Errorf("something wrong")
 	}
 
-	ss, _ := New().Randregex(`..\.adf.!\d\w`)
-	fmt.Println(ss)
+	reg := `..\.adf.!\d\w`
+	ss, _ := New().Randregex(reg)
+	fmt.Printf("`%s`: %s\n", reg, ss)
+
+	reg = `.[1-9koc\]]hoge`
+	ss, _ = New().Randregex(reg)
+	fmt.Printf("`%s`: %s\n", reg, ss)
 }
 
 func TestPicker(t *testing.T) {

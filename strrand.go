@@ -137,6 +137,12 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 			pickers = append(pickers, p)
 		case ".":
 			pickers = append(pickers, any)
+		case "[":
+			p, err := sr.handleBracket(chars)
+			if err != nil {
+				return []picker{}, err
+			}
+			pickers = append(pickers, p)
 		default:
 			pickers = append(pickers, chrPicker([]string{chr}))
 		}
@@ -171,4 +177,51 @@ func (sr *strrand) handleEscape(chars *[]string) (chrPicker, error) {
 	default:
 		return chrPicker([]string{chr}), nil
 	}
+}
+
+func (sr *strrand) handleBracket(chars *[]string) (chrPicker, error) {
+	p := chrPicker([]string{})
+	escaped := false
+	rangeJustFinished := false
+	startChr := ""
+
+	for {
+		if len(*chars) < 1 {
+			return p, fmt.Errorf("unmatched []")
+		}
+		chr := (*chars)[0]
+		*chars = (*chars)[1:]
+
+		if !escaped {
+			if chr == "]" {
+				break
+			}
+
+			if chr == `\` {
+				escaped = true
+				continue
+			}
+
+			if chr == "-" && len(p) > 0 {
+				if rangeJustFinished {
+					return p, fmt.Errorf("invalid range")
+				}
+				startChr = p[len(p)-1]
+				p = p[:len(p)-1]
+				continue
+			}
+		}
+
+		escaped = false
+		if startChr != "" {
+			r := makeRange(([]rune(startChr))[0], ([]rune(chr))[0])
+			p = append(p, r...)
+			rangeJustFinished = true
+			startChr = ""
+			continue
+		}
+		rangeJustFinished = false
+		p = append(p, chr)
+	}
+	return p, nil
 }
