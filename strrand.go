@@ -143,6 +143,12 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 				return []picker{}, err
 			}
 			pickers = append(pickers, p)
+		case "*":
+			*chars = append(strings.Split("{0,}", ""), (*chars)...)
+		case "+":
+			*chars = append(strings.Split("{1,}", ""), (*chars)...)
+		case "?":
+			*chars = append(strings.Split("{0,1}", ""), (*chars)...)
 		default:
 			pickers = append(pickers, chrPicker([]string{chr}))
 		}
