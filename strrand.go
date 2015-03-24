@@ -73,35 +73,42 @@ func New() *strrand {
 }
 
 func (sr *strrand) Randregex(pattern string) (string, error) {
+	result := ""
+	pickers, _ := sr.doRandregex(pattern)
+
+	for _, p := range pickers {
+		result += string(p.pick())
+	}
+	return result, nil
+}
+
+func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
+	pickers := []picker{}
 	chars := func() *[]string {
 		c := strings.Split(pattern, "")
 		return &c
 	}()
 
-	result := ""
 	for len(*chars) > 0 {
-		chr := (*chars)[0][0]
+		chr := ([]rune((*chars)[0]))[0]
 		*chars = (*chars)[1:]
 
 		switch chr {
 		case '\\':
-			result += sr.handleEscape(chars)
+			p, _ := sr.handleEscape(chars)
+			pickers = append(pickers, p)
 		case '.':
-			result += sr.handleDot()
+			pickers = append(pickers, any)
 		default:
-			result += string(chr)
+			pickers = append(pickers, picker([]rune{chr}))
 		}
 	}
-
-	return result, nil
+	return pickers, nil
 }
 
-func (sr *strrand) handleDot() string {
-	return string(any.pick())
-}
-
-func (st *strrand) handleEscape(chars *[]string) string {
-	chr := (*chars)[0]
+func (sr *strrand) handleEscape(chars *[]string) (picker, error) {
+	chr := ([]rune((*chars)[0]))[0]
 	*chars = (*chars)[1:]
-	return chr
+
+	return picker([]rune{chr}), nil
 }
