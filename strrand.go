@@ -23,7 +23,9 @@ func concat(ss ...[]string) (r []string) {
 type picker []string
 
 func (p picker) pick() string {
-	// XXX care empty picker
+	if len(p) < 1 {
+		return ""
+	}
 	idx := rand.Intn(len(p))
 	return p[idx]
 }
@@ -77,7 +79,7 @@ func (sr *strrand) Randregex(pattern string) (string, error) {
 	pickers, _ := sr.doRandregex(pattern)
 
 	for _, p := range pickers {
-		result += string(p.pick())
+		result += p.pick()
 	}
 	return result, nil
 }
