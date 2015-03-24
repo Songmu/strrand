@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type picker interface {
+	pick() string
+}
+
 func makeRange(from rune, to rune) (r []string) {
 	for i := from; i <= to; i++ {
 		r = append(r, string(i))
@@ -20,9 +24,9 @@ func concat(ss ...[]string) (r []string) {
 	return r
 }
 
-type picker []string
+type chrPicker []string
 
-func (p picker) pick() string {
+func (p chrPicker) pick() string {
 	if len(p) < 1 {
 		return ""
 	}
@@ -30,13 +34,13 @@ func (p picker) pick() string {
 	return p[idx]
 }
 
-var upper picker
-var lower picker
-var digit picker
-var punct picker
-var any picker
-var salt picker
-var binary picker
+var upper chrPicker
+var lower chrPicker
+var digit chrPicker
+var punct chrPicker
+var any chrPicker
+var salt chrPicker
+var binary chrPicker
 
 func init() {
 	rand.Seed(time.Now().Unix())
@@ -50,21 +54,21 @@ func init() {
 	salt = concat(upper, lower, digit, []string{".", "/"})
 }
 
-var patterns = map[string]picker{
-	"d": picker(digit),
-	"D": picker(concat(upper, lower, punct)),
-	"w": picker(concat(upper, lower, digit, []string{"_"})),
-	"W": picker(concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 94), makeRange(96, 96), makeRange(123, 126))),
-	"s": picker([]string{" ", "\t"}),
-	"S": picker(concat(upper, lower, digit, punct)),
+var patterns = map[string]chrPicker{
+	"d": chrPicker(digit),
+	"D": chrPicker(concat(upper, lower, punct)),
+	"w": chrPicker(concat(upper, lower, digit, []string{"_"})),
+	"W": chrPicker(concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 94), makeRange(96, 96), makeRange(123, 126))),
+	"s": chrPicker([]string{" ", "\t"}),
+	"S": chrPicker(concat(upper, lower, digit, punct)),
 
 	// these are translated to their double quoted equivalents.
-	"t": picker([]string{"\t"}),
-	"n": picker([]string{"\n"}),
-	"r": picker([]string{"\r"}),
-	"f": picker([]string{"\f"}),
-	"a": picker([]string{"\a"}),
-	"e": picker([]string{string(27)}), // escape character
+	"t": chrPicker([]string{"\t"}),
+	"n": chrPicker([]string{"\n"}),
+	"r": chrPicker([]string{"\r"}),
+	"f": chrPicker([]string{"\f"}),
+	"a": chrPicker([]string{"\a"}),
+	"e": chrPicker([]string{string(27)}), // escape character
 }
 
 type strrand struct {
@@ -112,15 +116,15 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 		case ".":
 			pickers = append(pickers, any)
 		default:
-			pickers = append(pickers, picker([]string{chr}))
+			pickers = append(pickers, chrPicker([]string{chr}))
 		}
 	}
 	return pickers, nil
 }
 
-func (sr *strrand) handleEscape(chars *[]string) (picker, error) {
+func (sr *strrand) handleEscape(chars *[]string) (chrPicker, error) {
 	chr := (*chars)[0]
 	*chars = (*chars)[1:]
 
-	return picker([]string{chr}), nil
+	return chrPicker([]string{chr}), nil
 }

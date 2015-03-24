@@ -18,9 +18,9 @@ func TestMakeRange(t *testing.T) {
 }
 
 func TestPicker(t *testing.T) {
-	p := picker([]string{"X"})
+	p := chrPicker([]string{"X"})
 
-	if !reflect.DeepEqual(p, picker([]string{"X"})) {
+	if !reflect.DeepEqual(p, chrPicker([]string{"X"})) {
 		t.Errorf("something wrong")
 	}
 
