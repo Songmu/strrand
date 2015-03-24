@@ -34,6 +34,28 @@ func (p chrPicker) pick() string {
 	return p[idx]
 }
 
+type variantPicker struct {
+	min    uint
+	max    uint
+	picker picker
+}
+
+func (vp variantPicker) pick() (str string) {
+	num := vp.decidePickNum()
+	for i := 0; i < num; i++ {
+		str += vp.picker.pick()
+	}
+	return str
+}
+
+func (vp variantPicker) decidePickNum() int {
+	if vp.max < vp.min {
+		return 0
+	}
+	fluct := vp.max - vp.min
+	return int(vp.min) + rand.Intn(int(fluct))
+}
+
 var upper chrPicker
 var lower chrPicker
 var digit chrPicker

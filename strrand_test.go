@@ -28,3 +28,18 @@ func TestPicker(t *testing.T) {
 		t.Errorf("something wrong")
 	}
 }
+
+func TestVariantPicker(t *testing.T) {
+	vp := variantPicker{
+		min:    1,
+		max:    3,
+		picker: chrPicker([]string{"a", "b", "c", "d"}),
+	}
+
+	r := vp.pick()
+	fmt.Println(r)
+
+	if len(r) < 1 || len(r) > 3 {
+		t.Errorf("something wrong")
+	}
+}
