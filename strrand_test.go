@@ -16,3 +16,15 @@ func TestMakeRange(t *testing.T) {
 	ss, _ := New().Randregex("..\\.adf.\\!")
 	fmt.Println(ss)
 }
+
+func TestPicker(t *testing.T) {
+	p := picker([]rune{'X'})
+
+	if !reflect.DeepEqual(p, picker([]rune{'X'})) {
+		t.Errorf("something wrong")
+	}
+
+	if p.pick() != 'X' {
+		t.Errorf("something wrong")
+	}
+}

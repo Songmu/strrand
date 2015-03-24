@@ -20,13 +20,21 @@ func concat(ss ...[]rune) (r []rune) {
 	return r
 }
 
-var upper []rune
-var lower []rune
-var digit []rune
-var punct []rune
-var any []rune
-var salt []rune
-var binary []rune
+type picker []rune
+
+func (p picker) pick() rune {
+	// XXX care empty picker
+	idx := rand.Intn(len(p))
+	return p[idx]
+}
+
+var upper picker
+var lower picker
+var digit picker
+var punct picker
+var any picker
+var salt picker
+var binary picker
 
 func init() {
 	rand.Seed(time.Now().Unix())
@@ -40,21 +48,21 @@ func init() {
 	salt = concat(upper, lower, digit, []rune{'.', '/'})
 }
 
-var patterns = map[rune]([]rune){
-	'd': digit,
-	'D': concat(upper, lower, punct),
-	'w': concat(upper, lower, digit, []rune{'_'}),
-	'W': concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 94), makeRange(96, 96), makeRange(123, 126)),
-	's': []rune{' ', '\t'},
-	'S': concat(upper, lower, digit, punct),
+var patterns = map[rune]picker{
+	'd': picker(digit),
+	'D': picker(concat(upper, lower, punct)),
+	'w': picker(concat(upper, lower, digit, []rune{'_'})),
+	'W': picker(concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 94), makeRange(96, 96), makeRange(123, 126))),
+	's': picker([]rune{' ', '\t'}),
+	'S': picker(concat(upper, lower, digit, punct)),
 
 	// these are translated to their double quoted equivalents.
-	't': []rune{'\t'},
-	'n': []rune{'\n'},
-	'r': []rune{'\r'},
-	'f': []rune{'\f'},
-	'a': []rune{'\a'},
-	'e': []rune{27}, // escape character
+	't': picker([]rune{'\t'}),
+	'n': picker([]rune{'\n'}),
+	'r': picker([]rune{'\r'}),
+	'f': picker([]rune{'\f'}),
+	'a': picker([]rune{'\a'}),
+	'e': picker([]rune{27}), // escape character
 }
 
 type strrand struct {
@@ -88,13 +96,8 @@ func (sr *strrand) Randregex(pattern string) (string, error) {
 	return result, nil
 }
 
-func randGet(s []rune) string {
-	idx := rand.Intn(len(s))
-	return string(s[idx])
-}
-
 func (sr *strrand) handleDot() string {
-	return randGet(any)
+	return string(any.pick())
 }
 
 func (st *strrand) handleEscape(chars *[]string) string {
