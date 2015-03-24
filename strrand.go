@@ -68,10 +68,20 @@ var patterns = map[string]picker{
 }
 
 type strrand struct {
+	Max uint
 }
 
 func New() *strrand {
 	return &strrand{}
+}
+
+var defaultMax uint = 10
+
+func (sr *strrand) max() uint {
+	if sr.Max < 1 {
+		return defaultMax
+	}
+	return sr.Max
 }
 
 func (sr *strrand) Randregex(pattern string) (string, error) {
