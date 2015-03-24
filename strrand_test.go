@@ -13,7 +13,7 @@ func TestMakeRange(t *testing.T) {
 		t.Errorf("something wrong")
 	}
 
-	ss, _ := New().Randregex("..\\.adf.\\!")
+	ss, _ := New().Randregex(`..\.adf.!\d\w`)
 	fmt.Println(ss)
 }
 

@@ -1,7 +1,9 @@
 package strrand
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -56,25 +58,17 @@ func (vp variantPicker) decidePickNum() int {
 	return int(vp.min) + rand.Intn(int(fluct))
 }
 
-var upper chrPicker
-var lower chrPicker
-var digit chrPicker
-var punct chrPicker
-var any chrPicker
-var salt chrPicker
-var binary chrPicker
-
 func init() {
 	rand.Seed(time.Now().Unix())
-
-	upper = makeRange('A', 'Z')
-	lower = makeRange('a', 'z')
-	digit = makeRange('0', '9')
-
-	punct = concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 96), makeRange(123, 126))
-	any = concat(upper, lower, digit, punct)
-	salt = concat(upper, lower, digit, []string{".", "/"})
 }
+
+var upper chrPicker = makeRange('A', 'Z')
+var lower chrPicker = makeRange('a', 'z')
+var digit chrPicker = makeRange('0', '9')
+
+var punct chrPicker = concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 96), makeRange(123, 126))
+var any chrPicker = concat(upper, lower, digit, punct)
+var salt chrPicker = concat(upper, lower, digit, []string{".", "/"})
 
 var patterns = map[string]chrPicker{
 	"d": chrPicker(digit),
@@ -112,7 +106,10 @@ func (sr *strrand) max() uint {
 
 func (sr *strrand) Randregex(pattern string) (string, error) {
 	result := ""
-	pickers, _ := sr.doRandregex(pattern)
+	pickers, err := sr.doRandregex(pattern)
+	if err != nil {
+		return result, err
+	}
 
 	for _, p := range pickers {
 		result += p.pick()
@@ -133,7 +130,10 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 
 		switch chr {
 		case "\\":
-			p, _ := sr.handleEscape(chars)
+			p, err := sr.handleEscape(chars)
+			if err != nil {
+				return []picker{}, err
+			}
 			pickers = append(pickers, p)
 		case ".":
 			pickers = append(pickers, any)
@@ -145,8 +145,30 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 }
 
 func (sr *strrand) handleEscape(chars *[]string) (chrPicker, error) {
+	if len(*chars) < 1 {
+		return chrPicker([]string{}), fmt.Errorf("regex not terminated")
+	}
 	chr := (*chars)[0]
 	*chars = (*chars)[1:]
 
-	return chrPicker([]string{chr}), nil
+	if val, ok := patterns[chr]; ok {
+		return val, nil
+	}
+
+	switch chr {
+	case "x":
+		if len(*chars) < 2 {
+			return chrPicker([]string{}), fmt.Errorf("invalid hex format")
+		}
+		hex := (*chars)[0] + (*chars)[1]
+		*chars = (*chars)[2:]
+
+		c, err := strconv.ParseInt(hex, 16, 32)
+		if err != nil {
+			return chrPicker([]string{}), err
+		}
+		return chrPicker([]string{string(c)}), nil
+	default:
+		return chrPicker([]string{chr}), nil
+	}
 }
