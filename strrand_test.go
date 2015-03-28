@@ -12,22 +12,43 @@ func TestMakeRange(t *testing.T) {
 	if !reflect.DeepEqual(s, []string{"A", "B", "C"}) {
 		t.Errorf("something wrong")
 	}
+}
 
-	reg := `..\.adf.!\d\w`
-	ss, _ := New().Generate(reg)
-	fmt.Printf("`%s`: %s\n", reg, ss)
+func TestCreateGenerator(t *testing.T) {
+	reg := `.\.a{1,4}[a-c][A-B]?\d*\s+\![-OMG!\?]`
+	g, _ := New().CreateGenerator(reg)
 
-	reg = `.[1-9koc\]]hoge`
-	ss, _ = New().Generate(reg)
-	fmt.Printf("`%s`: %s\n", reg, ss)
+	if !reflect.DeepEqual(g, pickers([]picker{
+		any,
+		chrPicker([]string{"."}),
+		variantPicker{
+			min:    1,
+			max:    4,
+			picker: chrPicker([]string{"a"}),
+		},
+		chrPicker([]string{"a", "b", "c"}),
+		variantPicker{
+			min:    0,
+			max:    1,
+			picker: chrPicker([]string{"A", "B"}),
+		},
+		variantPicker{
+			min:    0,
+			max:    10,
+			picker: digit,
+		},
+		variantPicker{
+			min:    1,
+			max:    10,
+			picker: chrPicker([]string{" ", "\t"}),
+		},
+		chrPicker([]string{"!"}),
+		chrPicker([]string{"-", "O", "M", "G", "!", "?"}),
+	})) {
+		t.Errorf("error")
+	}
 
-	reg = `[1-9koc\]]{16}`
-	ss, _ = New().Generate(reg)
-	fmt.Printf("`%s`: %s\n", reg, ss)
-
-	reg = `a{1,4}`
-	ss, _ = New().Generate(reg)
-	fmt.Printf("`%s`: %s\n", reg, ss)
+	fmt.Printf("`%s`: %s\n", reg, g.Generate())
 }
 
 func TestPicker(t *testing.T) {
