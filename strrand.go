@@ -97,7 +97,7 @@ var patterns = map[string]chrPicker{
 	"e": chrPicker([]string{string(27)}), // escape character
 }
 
-type strrand struct {
+type Strrand struct {
 	Max uint
 }
 
@@ -115,14 +115,14 @@ func (pis pickers) Generate() string {
 	return result
 }
 
-// New returns strrand struct
-func New() *strrand {
-	return &strrand{}
+// New returns Strrand struct
+func New() *Strrand {
+	return &Strrand{}
 }
 
 var defaultMax uint = 10
 
-func (sr *strrand) max() uint {
+func (sr *Strrand) max() uint {
 	if sr.Max < 1 {
 		return defaultMax
 	}
@@ -130,7 +130,7 @@ func (sr *strrand) max() uint {
 }
 
 // Generate generates random string
-func (sr *strrand) Generate(pattern string) (string, error) {
+func (sr *Strrand) Generate(pattern string) (string, error) {
 	result := ""
 	g, err := sr.CreateGenerator(pattern)
 	if err != nil {
@@ -140,7 +140,7 @@ func (sr *strrand) Generate(pattern string) (string, error) {
 }
 
 // Creategenerator returns random string generator
-func (sr *strrand) CreateGenerator(pattern string) (generator, error) {
+func (sr *Strrand) CreateGenerator(pattern string) (generator, error) {
 	pis := pickers([]picker{})
 	chars := func() *[]string {
 		c := strings.Split(pattern, "")
@@ -190,7 +190,7 @@ func (sr *strrand) CreateGenerator(pattern string) (generator, error) {
 	return pis, nil
 }
 
-func (sr *strrand) handleEscape(chars *[]string) (picker, error) {
+func (sr *Strrand) handleEscape(chars *[]string) (picker, error) {
 	if len(*chars) < 1 {
 		return chrPicker([]string{}), fmt.Errorf("regex not terminated")
 	}
@@ -219,7 +219,7 @@ func (sr *strrand) handleEscape(chars *[]string) (picker, error) {
 	}
 }
 
-func (sr *strrand) handleBracket(chars *[]string) (picker, error) {
+func (sr *Strrand) handleBracket(chars *[]string) (picker, error) {
 	p := chrPicker([]string{})
 	escaped := false
 	rangeJustFinished := false
@@ -269,7 +269,7 @@ func (sr *strrand) handleBracket(chars *[]string) (picker, error) {
 var rangeChrRe = regexp.MustCompile(`[0-9,]`)
 var rangeRe = regexp.MustCompile(`^([0-9]+),([0-9]+)?$`)
 
-func (sr *strrand) handleBrace(chars *[]string, p picker) (picker, error) {
+func (sr *Strrand) handleBrace(chars *[]string, p picker) (picker, error) {
 	hasComma := false
 	buf := ""
 	for {
