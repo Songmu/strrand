@@ -4,10 +4,12 @@ strrand
 [![Build Status](https://travis-ci.org/Songmu/strrand.png?branch=master)][travis]
 [![Coverage Status](https://coveralls.io/repos/Songmu/strrand/badge.png?branch=master)][coveralls]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
+[![GoDoc](https://godoc.org/github.com/Songmu/strrand?status.svg)](godoc)
 
 [travis]: https://travis-ci.org/Songmu/strrand
 [coveralls]: https://coveralls.io/r/Songmu/strrand?branch=master
 [license]: https://github.com/Songmu/strrand/blob/master/LICENSE
+[godoc]: https://godoc.org/github.com/Songmu/strrand
 
 ## Description
 
