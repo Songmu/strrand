@@ -97,6 +97,7 @@ var patterns = map[string]chrPicker{
 	"e": chrPicker([]string{string(27)}), // escape character
 }
 
+// Strrand factory object of random string generator
 type Strrand struct {
 	Max uint
 }
@@ -139,7 +140,7 @@ func (sr *Strrand) Generate(pattern string) (string, error) {
 	return g.Generate(), nil
 }
 
-// Creategenerator returns random string generator
+// CreateGenerator returns random string generator
 func (sr *Strrand) CreateGenerator(pattern string) (generator, error) {
 	pis := pickers([]picker{})
 	chars := func() *[]string {
