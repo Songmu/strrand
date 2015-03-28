@@ -97,6 +97,20 @@ type strrand struct {
 	Max uint
 }
 
+type generator interface {
+	Generate() string
+}
+
+type pickers []picker
+
+func (pis pickers) Generate() string {
+	result := ""
+	for _, p := range pis {
+		result += p.pick()
+	}
+	return result
+}
+
 func New() *strrand {
 	return &strrand{}
 }
@@ -110,21 +124,17 @@ func (sr *strrand) max() uint {
 	return sr.Max
 }
 
-func (sr *strrand) Randregex(pattern string) (string, error) {
+func (sr *strrand) Generate(pattern string) (string, error) {
 	result := ""
-	pickers, err := sr.doRandregex(pattern)
+	g, err := sr.CreateGenerator(pattern)
 	if err != nil {
 		return result, err
 	}
-
-	for _, p := range pickers {
-		result += p.pick()
-	}
-	return result, nil
+	return g.Generate(), nil
 }
 
-func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
-	pickers := []picker{}
+func (sr *strrand) CreateGenerator(pattern string) (generator, error) {
+	pis := pickers([]picker{})
 	chars := func() *[]string {
 		c := strings.Split(pattern, "")
 		return &c
@@ -138,17 +148,17 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 		case "\\":
 			p, err := sr.handleEscape(chars)
 			if err != nil {
-				return []picker{}, err
+				return nil, err
 			}
-			pickers = append(pickers, p)
+			pis = append(pis, p)
 		case ".":
-			pickers = append(pickers, any)
+			pis = append(pis, any)
 		case "[":
 			p, err := sr.handleBracket(chars)
 			if err != nil {
-				return []picker{}, err
+				return nil, err
 			}
-			pickers = append(pickers, p)
+			pis = append(pis, p)
 		case "*":
 			*chars = append(strings.Split("{0,}", ""), (*chars)...)
 		case "+":
@@ -156,21 +166,21 @@ func (sr *strrand) doRandregex(pattern string) ([]picker, error) {
 		case "?":
 			*chars = append(strings.Split("{0,1}", ""), (*chars)...)
 		case "{":
-			if len(pickers) < 1 {
-				return pickers, fmt.Errorf("invalid bracket")
+			if len(pis) < 1 {
+				return pis, fmt.Errorf("invalid bracket")
 			}
-			pop := pickers[len(pickers)-1]
-			pickers = pickers[:len(pickers)-1]
+			pop := pis[len(pis)-1]
+			pis = pis[:len(pis)-1]
 			p, err := sr.handleBrace(chars, pop)
 			if err != nil {
-				return pickers, err
+				return pis, err
 			}
-			pickers = append(pickers, p)
+			pis = append(pis, p)
 		default:
-			pickers = append(pickers, chrPicker([]string{chr}))
+			pis = append(pis, chrPicker([]string{chr}))
 		}
 	}
-	return pickers, nil
+	return pis, nil
 }
 
 func (sr *strrand) handleEscape(chars *[]string) (picker, error) {

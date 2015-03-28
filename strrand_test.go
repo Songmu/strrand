@@ -14,19 +14,19 @@ func TestMakeRange(t *testing.T) {
 	}
 
 	reg := `..\.adf.!\d\w`
-	ss, _ := New().Randregex(reg)
+	ss, _ := New().Generate(reg)
 	fmt.Printf("`%s`: %s\n", reg, ss)
 
 	reg = `.[1-9koc\]]hoge`
-	ss, _ = New().Randregex(reg)
+	ss, _ = New().Generate(reg)
 	fmt.Printf("`%s`: %s\n", reg, ss)
 
 	reg = `[1-9koc\]]{16}`
-	ss, _ = New().Randregex(reg)
+	ss, _ = New().Generate(reg)
 	fmt.Printf("`%s`: %s\n", reg, ss)
 
 	reg = `a{1,4}`
-	ss, _ = New().Randregex(reg)
+	ss, _ = New().Generate(reg)
 	fmt.Printf("`%s`: %s\n", reg, ss)
 }
 
