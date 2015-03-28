@@ -48,6 +48,10 @@ Please note that the pattern arguments are not real regular expressions. Only a 
     ?     Same as {0,1}.
     +     Same as {1,}.
 
+## Disclaimer
+
+Seeding is naive and not secure. So, don't use this for creating password and so on.
+
 ## Author
 
 [Songmu](https://github.com/Songmu)
