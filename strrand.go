@@ -69,7 +69,7 @@ func (vp variantPicker) decidePickNum() int {
 }
 
 func init() {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 }
 
 var upper chrPicker = makeRange('A', 'Z')
