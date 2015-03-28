@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// RandomString returns random string from pattern
+func RandomString(pattern string) (string, error) {
+	return New().Generate(pattern)
+}
+
 type picker interface {
 	pick() string
 }
@@ -73,7 +78,6 @@ var digit chrPicker = makeRange('0', '9')
 
 var punct chrPicker = concat(makeRange(33, 47), makeRange(58, 64), makeRange(91, 96), makeRange(123, 126))
 var any chrPicker = concat(upper, lower, digit, punct)
-var salt chrPicker = concat(upper, lower, digit, []string{".", "/"})
 
 var patterns = map[string]chrPicker{
 	"d": chrPicker(digit),
@@ -111,6 +115,7 @@ func (pis pickers) Generate() string {
 	return result
 }
 
+// New returns strrand struct
 func New() *strrand {
 	return &strrand{}
 }
@@ -124,6 +129,7 @@ func (sr *strrand) max() uint {
 	return sr.Max
 }
 
+// Generate generates random string
 func (sr *strrand) Generate(pattern string) (string, error) {
 	result := ""
 	g, err := sr.CreateGenerator(pattern)
@@ -133,6 +139,7 @@ func (sr *strrand) Generate(pattern string) (string, error) {
 	return g.Generate(), nil
 }
 
+// Creategenerator returns random string generator
 func (sr *strrand) CreateGenerator(pattern string) (generator, error) {
 	pis := pickers([]picker{})
 	chars := func() *[]string {

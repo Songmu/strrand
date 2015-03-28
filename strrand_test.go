@@ -77,3 +77,11 @@ func TestVariantPicker(t *testing.T) {
 		t.Errorf("something wrong")
 	}
 }
+
+func TestRandomString(t *testing.T) {
+	str, _ := RandomString("hoge")
+
+	if str != "hoge" {
+		t.Errorf("something wrong")
+	}
+}
