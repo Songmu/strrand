@@ -102,7 +102,8 @@ type Strrand struct {
 	Max uint
 }
 
-type generator interface {
+// Generator generating random strings
+type Generator interface {
 	Generate() string
 }
 
@@ -141,7 +142,7 @@ func (sr *Strrand) Generate(pattern string) (string, error) {
 }
 
 // CreateGenerator returns random string generator
-func (sr *Strrand) CreateGenerator(pattern string) (generator, error) {
+func (sr *Strrand) CreateGenerator(pattern string) (Generator, error) {
 	pis := pickers([]picker{})
 	chars := func() *[]string {
 		c := strings.Split(pattern, "")
