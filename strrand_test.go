@@ -85,3 +85,23 @@ func TestRandomString(t *testing.T) {
 		t.Errorf("something wrong")
 	}
 }
+
+func TestCreateGeneratorNaruho(t *testing.T) {
+	reg := `なるほど?`
+	g, _ := New().CreateGenerator(reg)
+
+	if !reflect.DeepEqual(g, pickers([]picker{
+		chrPicker([]string{"な"}),
+		chrPicker([]string{"る"}),
+		chrPicker([]string{"ほ"}),
+		variantPicker{
+			min:    0,
+			max:    1,
+			picker: chrPicker([]string{"ど"}),
+		},
+	})) {
+		t.Errorf("error")
+	}
+
+	fmt.Printf("`%s`: %s\n", reg, g.Generate())
+}

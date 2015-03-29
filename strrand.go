@@ -60,12 +60,7 @@ func (vp variantPicker) decidePickNum() int {
 	if vp.max < vp.min {
 		return 0
 	}
-	if vp.max == vp.min {
-		return int(vp.min)
-	}
-	fluct := vp.max - vp.min
-
-	return int(vp.min) + rand.Intn(int(fluct))
+	return int(vp.min) + rand.Intn(int(vp.max-vp.min)+1)
 }
 
 func init() {
